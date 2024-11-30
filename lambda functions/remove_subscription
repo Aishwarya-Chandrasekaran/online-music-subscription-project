@@ -1,0 +1,27 @@
+#Lambda function for removing subscribed songs
+
+import boto3
+import json
+
+dynamodb = boto3.resource('dynamodb')
+table_name = "subscription"
+
+def lambda_handler(event, context):
+    body = json.loads(event['body'])
+    email = body['email']
+    title = body['title']
+
+    table = dynamodb.Table(table_name)
+
+    # Remove subscription
+    response = table.delete_item(
+        Key={
+            'email': email,
+            'title': title
+        }
+    )
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps({'message': 'Subscription removed successfully.'})
+    }
