@@ -1,0 +1,85 @@
+#Lambda function for user registration
+
+import boto3
+import json
+
+dynamodb = boto3.resource('dynamodb')
+table_name = "login"
+
+def lambda_handler(event, context):
+    body = json.loads(event['body'])
+    email = body['email']
+    username = body['username']
+    password = body['password']
+
+    table = dynamodb.Table(table_name)
+
+    # Check if user already exists
+    response = table.get_item(Key={'email': email})
+    if 'Item' in response:
+        return {
+            'statusCode': 400,
+            'body': json.dumps({'message': 'User already exists.'})
+        }
+
+    # Add new user
+    table.put_item(Item={'email': email, 'username': username, 'password': password})
+
+    return {
+        'statusCode': 201,
+        'body': json.dumps({'message': 'User registered successfully.'})
+    }
+
+#Lambda function for subscribing to songs
+
+import boto3
+import json
+
+dynamodb = boto3.resource('dynamodb')
+table_name = "subscription"
+
+def lambda_handler(event, context):
+    body = json.loads(event['body'])
+    email = body['email']
+    title = body['title']
+    artist = body['artist']
+    year = body['year']
+
+    table = dynamodb.Table(table_name)
+
+    # Add subscription
+    table.put_item(Item={'email': email, 'title': title, 'artist': artist, 'year': year})
+
+    return {
+        'statusCode': 201,
+        'body': json.dumps({'message': 'Subscription added successfully.'})
+    }
+
+
+#Lambda function for removing subscribed songs
+
+import boto3
+import json
+
+dynamodb = boto3.resource('dynamodb')
+table_name = "subscription"
+
+def lambda_handler(event, context):
+    body = json.loads(event['body'])
+    email = body['email']
+    title = body['title']
+
+    table = dynamodb.Table(table_name)
+
+    # Remove subscription
+    response = table.delete_item(
+        Key={
+            'email': email,
+            'title': title
+        }
+    )
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps({'message': 'Subscription removed successfully.'})
+    }
