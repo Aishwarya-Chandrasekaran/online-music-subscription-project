@@ -30,30 +30,6 @@ def lambda_handler(event, context):
         'body': json.dumps({'message': 'User registered successfully.'})
     }
 
-#Lambda function for subscribing to songs
-
-import boto3
-import json
-
-dynamodb = boto3.resource('dynamodb')
-table_name = "subscription"
-
-def lambda_handler(event, context):
-    body = json.loads(event['body'])
-    email = body['email']
-    title = body['title']
-    artist = body['artist']
-    year = body['year']
-
-    table = dynamodb.Table(table_name)
-
-    # Add subscription
-    table.put_item(Item={'email': email, 'title': title, 'artist': artist, 'year': year})
-
-    return {
-        'statusCode': 201,
-        'body': json.dumps({'message': 'Subscription added successfully.'})
-    }
 
 
 #Lambda function for removing subscribed songs
